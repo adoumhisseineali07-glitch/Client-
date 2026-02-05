@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEBTY-PRO INTERNATIONAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="manifest" href="manifest.json">
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script>
+
+    <style>
+        /* --- DESIGN & COULEURS --- */
+        :root {
+            --primary: #0d47a1;
+            --secondary: #2196f3;
+            --success: #00c853;
+            --bg: #f5f7fa;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding-bottom: 80px;
+        }
+
+        /* Écran de verrouillage */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        /* En-tête et Stats */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        /* Cartes de crédit */
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 12px;
+            border-left: 5px solid var(--secondary);
+            position: relative;
+        }
+
+        .card.paid {
+            border-left-color: var(--success);
+            opacity: 0.7;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .client-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .amount {
+            color: #d32f2f;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Boutons d'action */
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-wa {
+            background: #25D366;
+        }
+
+        .btn-pay {
+            background: var(--primary);
+        }
+
+        .btn-edit {
+            background: #f39c12;
+            flex: 0.3;
+        }
+
+        /* Interface Flottante et Modales */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--secondary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: none;
+            z-index: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 85%;
+            border-radius: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            background: #ddd;
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="color: var(--primary)">DÉBTY-PRO 🔐</h2>
+            <input type="number" id="log-u" placeholder="Téléphone Admin">
+            <input type="password" id="log-p" placeholder="Code PIN">
+            <button onclick="checkLogin()"
+                style="background: var(--secondary); width: 100%; padding: 15px; border-radius: 10px; border:none; color:white; font-weight:bold;">OUVRIR
+                LA SESSION</button>
+        </div>
+    </div>
+
+    <div id="app" style="display:none">
+        <div class="header">
+            <strong>SUIVI DES CRÉDITS CLIENTS</strong>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div id="t-dette" style="font-size: 1.2em; font-weight: bold;">0 F</div> <small>Dettes en
+                        cours</small>
+                </div>
+                <div class="stat-box">
+                    <div id="t-paye" style="font-size: 1.2em; font-weight: bold;">0 F</div> <small>Total
+                        récupéré</small>
+                </div>
+            </div>
+            <button onclick="exportData()"
+                style="background:none; color:white; font-size:0.7em; margin-top:10px; text-decoration:underline; border:none; cursor:pointer">Exporter
+                une Sauvegarde (.txt)</button>
+        </div>
+
+        <div class="container">
+            <input type="text" id="search" class="search-bar" placeholder="🔍 Rechercher un client ou article..."
+                onkeyup="render()">
+
+            <div class="tabs">
+                <div class="tab active" id="tab-en_cours" onclick="switchTab('en_cours')">Dettes Actives</div>
+                <div class="tab" id="tab-histo" onclick="switchTab('histo')">Dettes Payées</div>
+            </div>
+
+            <div id="list"></div>
+        </div>
+
+        <button class="fab" onclick="showAdd()">+</button>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Nouveau Crédit</h3>
+            <input type="hidden" id="edit-id"> <input type="text" id="f-nom" placeholder="Nom du Client">
+            <input type="number" id="f-tel" placeholder="N° WhatsApp (sans indicatif)">
+            <input type="number" id="f-mnt" placeholder="Montant">
+            <input type="text" id="f-mot" placeholder="Article(s) acheté(s)">
+            <div class="actions">
+                <button onclick="closeModal()" style="background:#999">Annuler</button>
+                <button onclick="saveDette()" style="background:var(--success)">ENREGISTRER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================
+    CONFIG ET VARIABLES GLOBALES
+    ========================================================== */
+        // On récupère le code PIN enregistré ou on prépare la création
+        let savedPIN = localStorage.getItem('debty_pin_pro');
+        let db = JSON.parse(localStorage.getItem('debty_v2_cam')) || [];
+        let tab = 'en_cours';
+
+        /* ==========================================================
+           FONCTIONS DE SÉCURITÉ (AMÉLIORÉES)
+           ========================================================== */
+
+        // Fonction au démarrage pour adapter l'écran de login
+        window.onload = function () {
+            if (!savedPIN) {
+                document.querySelector('#login-screen h2').innerText = "BIENVENUE (1ère Utilisation)";
+                document.querySelector('#login-screen p').innerText = "Veuillez créer votre code PIN de sécurité";
+                document.querySelector('.login-btn').innerText = "CRÉER MON CODE";
+            }
+        }
+
+        function checkLogin() {
+            const pInput = document.getElementById('log-p').value;
+
+            // Si aucun PIN n'existe (Premier lancement)
+            if (!savedPIN) {
+                if (pInput.length >= 4) {
+                    localStorage.setItem('debty_pin_pro', pInput);
+                    savedPIN = pInput;
+                    alert("✅ Code PIN créé avec succès ! Ne l'oubliez pas.");
+                    entrerDansApp();
+                } else {
+                    alert("Le code doit avoir au moins 4 chiffres");
+                }
+            }
+            // Si un PIN existe déjà
+            else {
+                if (pInput === savedPIN) {
+                    entrerDansApp();
+                } else {
+                    alert("⛔ CODE PIN INCORRECT !");
+                }
+            }
+        }
+
+        function entrerDansApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
+            render();
+        }
+
+        /* ==========================================================
+           FONCTIONS DE GESTION DES DONNÉES
+           ========================================================== */
+
+        // Change l'affichage entre "En cours" et "Historique"
+        function switchTab(t) {
+            tab = t;
+            document.getElementById('tab-en_cours').classList.toggle('active', t === 'en_cours');
+            document.getElementById('tab-histo').classList.toggle('active', t === 'histo');
+            render();
+        }
+
+        // Prépare le formulaire pour une nouvelle entrée
+        function showAdd() {
+            document.getElementById('modal-title').innerText = "Nouveau Crédit";
+            document.getElementById('edit-id').value = ""; // Vide l'ID pour dire "c'est un nouveau"
+            document.getElementById('f-nom').value = "";
+            document.getElementById('f-tel').value = "";
+            document.getElementById('f-mnt').value = "";
+            document.getElementById('f-mot').value = "";
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        // Enregistre ou Modifie une dette dans la base
+        function saveDette() {
+            const id = document.getElementById('edit-id').value;
+            const data = {
+                id: id ? parseInt(id) : Date.now(), // On garde l'ancien ID ou on en crée un nouveau
+                nom: document.getElementById('f-nom').value,
+                tel: document.getElementById('f-tel').value,
+                mnt: parseInt(document.getElementById('f-mnt').value),
+                mot: document.getElementById('f-mot').value,
+                date: new Date().toLocaleDateString(),
+                paye: false
+            };
+
+            if (!data.nom || !data.mnt) return alert("Veuillez remplir au moins le nom et le montant.");
+
+            if (id) {
+                // Si on a un ID, on cherche la position de la dette pour la mettre à jour
+                const index = db.findIndex(d => d.id === parseInt(id));
+                db[index] = { ...db[index], ...data };
+            } else {
+                // Sinon on l'ajoute au début de la liste
+                db.unshift(data);
+            }
+
+            localStorage.setItem('debty_v2_cam', JSON.stringify(db));
+            closeModal();
+            render();
+        }
+
+        // Remplit le formulaire avec les données d'un client existant pour modification
+        function editDette(id) {
+            const d = db.find(x => x.id === id);
+            document.getElementById('modal-title').innerText = "Modifier Crédit";
+            document.getElementById('edit-id').value = d.id;
+            document.getElementById('f-nom').value = d.nom;
+            document.getElementById('f-tel').value = d.tel;
+            document.getElementById('f-mnt').value = d.mnt;
+            document.getElementById('f-mot').value = d.mot;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        // Marque une dette comme réglée
+        function encaisser(id) {
+            if (confirm("L'argent a-t-il été bien reçu ?")) {
+                let d = db.find(x => x.id === id);
+                d.paye = true;
+                d.datePaye = new Date().toLocaleDateString();
+                localStorage.setItem('debty_v2_cam', JSON.stringify(db));
+                render();
+            }
+        }
+
+        /* ==========================================================
+           FONCTIONS INTERNATIONALES (WHATSAPP & EXPORT)
+           ========================================================== */
+
+        // Envoie le message WhatsApp automatique
+        function rappel(nom, tel, mnt, mot) {
+            if (!tel) return alert("Aucun numéro WhatsApp enregistré.");
+
+            // --- ZONE INTERNATIONALE ---
+            // Pour le Cameroun : 237. Pour le Tchad : 235. Pour le Niger : 227.
+            let indicatif = "237";
+            let n = tel.startsWith(indicatif) ? tel : indicatif + tel;
+
+            const m = `Bonjour *${nom}*, sauf erreur de ma part, nous attendons le règlement de votre dette de *${mnt} F* pour : *${mot}*. Merci de passer à la boutique.`;
+            window.open(`https://wa.me/${n}?text=${encodeURIComponent(m)}`);
+        }
+
+        // Télécharge un fichier de secours sur le téléphone
+        function exportData() {
+            const blob = new Blob([JSON.stringify(db)], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `SAVE_DETTES_PRO_${new Date().toLocaleDateString()}.txt`;
+            a.click();
+        }
+
+        function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+        /* ==========================================================
+           MOTEUR D'AFFICHAGE (RENDER)
+           ========================================================== */
+        function render() {
+            const list = document.getElementById('list');
+            const search = document.getElementById('search').value.toLowerCase();
+            list.innerHTML = "";
+
+            // Calcul des totaux
+            let sDette = 0, sPaye = 0;
+            db.forEach(x => { if (x.paye) sPaye += x.mnt; else sDette += x.mnt; });
+            document.getElementById('t-dette').innerText = sDette.toLocaleString() + " F";
+            document.getElementById('t-paye').innerText = sPaye.toLocaleString() + " F";
+
+            // Filtrage selon onglet ET recherche
+            const filtered = db.filter(x =>
+                (tab === 'en_cours' ? !x.paye : x.paye) &&
+                (x.nom.toLowerCase().includes(search) || x.mot.toLowerCase().includes(search))
+            );
+
+            if (filtered.length === 0) list.innerHTML = "<p style='text-align:center;color:#999'>Aucun dossier trouvé.</p>";
+
+            filtered.forEach(x => {
+                list.innerHTML += `
+                    <div class="card ${x.paye ? 'paid' : ''}">
+                        <div class="row">
+                            <div><strong>${x.nom}</strong><br><small>${x.mot} (${x.date})</small></div>
+                            <div class="amount">${x.mnt.toLocaleString()} F</div>
+                        </div>
+                        ${!x.paye ? `
+                        <div class="actions">
+                            <button class="btn-edit" onclick="editDette(${x.id})">✏️</button>
+                            <button class="btn-wa" onclick="rappel('${x.nom}','${x.tel}',${x.mnt},'${x.mot}')">RAPPEL WA</button>
+                            <button class="btn-pay" onclick="encaisser(${x.id})">RÉGLÉ ✅</button>
+                        </div>` : `<div style="text-align:right; color:green; font-size:0.8em; margin-top:5px">Payé le ${x.datePaye}</div>`}
+                    </div>`;
+            });
+        }
+    </script>
+</body>
+
+  </html>
+                  
