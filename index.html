@@ -6,54 +6,215 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEBTY-PRO INTERNATIONAL</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    
-    <link rel="manifest" href="manifest.json">
-    <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-      }
-    </script>
-
     <style>
-        :root { --primary: #0d47a1; --secondary: #2196f3; --success: #00c853; --danger: #d32f2f; --bg: #f5f7fa; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; }
+        /* --- DESIGN & COULEURS --- */
+        :root {
+            --primary: #0d47a1;
+            --secondary: #2196f3;
+            --success: #00c853;
+            --bg: #f5f7fa;
+        }
 
-        #login-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--primary); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 320px; text-align: center; }
-        .login-box input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 18px; text-align: center; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            padding-bottom: 80px;
+        }
 
-        .header { background: var(--primary); color: white; padding: 20px; text-align: center; border-radius: 0 0 20px 20px; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .stat-box { background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 10px; }
-        .container { padding: 15px; }
-        .search-bar { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; box-sizing: border-box; font-size: 16px; }
+        /* Écran de verrouillage */
+        #login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .card { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); margin-bottom: 12px; border-left: 5px solid var(--secondary); position: relative; }
-        .card.paid { border-left-color: var(--success); opacity: 0.7; }
-        .card.expense { border-left-color: var(--danger); } /* Style pour les dépenses */
-        
-        .row { display: flex; justify-content: space-between; align-items: center; }
-        .amount { color: var(--danger); font-weight: bold; font-size: 1.1em; }
-        .amount.plus { color: var(--success); }
+        .login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 320px;
+            text-align: center;
+        }
 
-        .actions { display: flex; gap: 8px; margin-top: 12px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: bold; color: white; cursor: pointer; }
-        .btn-wa { background: #25D366; }
-        .btn-pay { background: var(--primary); }
-        .btn-edit { background: #f39c12; flex: 0.3; }
+        .login-box input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 18px;
+            text-align: center;
+        }
 
-        .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 500; }
-        .fab { width: 60px; height: 60px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-size: 24px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); border: none; }
-        .fab.add-dette { background: var(--secondary); }
-        .fab.add-depense { background: var(--danger); font-size: 18px; width: 50px; height: 50px; align-self: flex-end; }
+        /* En-tête et Stats */
+        .header {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+        }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); align-items: center; justify-content: center; z-index: 1000; }
-        .modal-content { background: white; padding: 20px; width: 85%; border-radius: 15px; }
-        .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
 
-        .tabs { display: flex; margin-bottom: 15px; background: #ddd; padding: 4px; border-radius: 10px; }
-        .tab { flex: 1; text-align: center; padding: 8px; cursor: pointer; border-radius: 8px; }
-        .tab.active { background: white; color: var(--primary); font-weight: bold; }
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .container {
+            padding: 15px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        /* Cartes de crédit */
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 12px;
+            border-left: 5px solid var(--secondary);
+            position: relative;
+        }
+
+        .card.paid {
+            border-left-color: var(--success);
+            opacity: 0.7;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .client-name {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .amount {
+            color: #d32f2f;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Boutons d'action */
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+        }
+
+        .btn-wa {
+            background: #25D366;
+        }
+
+        .btn-pay {
+            background: var(--primary);
+        }
+
+        .btn-edit {
+            background: #f39c12;
+            flex: 0.3;
+        }
+
+        /* Interface Flottante et Modales */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--secondary);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: none;
+            z-index: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            width: 85%;
+            border-radius: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            background: #ddd;
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--primary);
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -62,237 +223,336 @@
     <div id="login-screen">
         <div class="login-box">
             <h2 style="color: var(--primary)">DÉBTY-PRO 🔐</h2>
-            <p id="log-desc" style="font-size: 0.9em; color: #666; margin-bottom: 10px;">Entrez votre code PIN</p>
+            <input type="number" id="log-u" placeholder="Téléphone Admin">
             <input type="password" id="log-p" placeholder="Code PIN">
-            <button onclick="checkLogin()" id="btn-login-main" style="background: var(--secondary); width: 100%; padding: 15px; border-radius: 10px; border:none; color:white; font-weight:bold; cursor:pointer;">OUVRIR LA SESSION</button>
+            <button onclick="checkLogin()"
+                style="background: var(--secondary); width: 100%; padding: 15px; border-radius: 10px; border:none; color:white; font-weight:bold;">OUVRIR
+                LA SESSION</button>
         </div>
     </div>
 
     <div id="app" style="display:none">
         <div class="header">
-            <strong>SUIVI DES CRÉDITS & DÉPENSES</strong>
+            <strong>SUIVI DES CRÉDITS CLIENTS</strong>
             <div class="stats-grid">
                 <div class="stat-box">
-                    <div id="t-dette" style="font-size: 1.1em; font-weight: bold;">0 F</div> <small>Dettes</small>
+                    <div id="t-dette" style="font-size: 1.2em; font-weight: bold;">0 F</div> <small>Dettes en
+                        cours</small>
                 </div>
                 <div class="stat-box">
-                    <div id="t-depense" style="font-size: 1.1em; font-weight: bold;">0 F</div> <small>Dépenses</small>
+                    <div id="t-paye" style="font-size: 1.2em; font-weight: bold;">0 F</div> <small>Total
+                        récupéré</small>
                 </div>
             </div>
-            <button onclick="exportData()" style="background:none; color:white; font-size:0.7em; margin-top:10px; text-decoration:underline; border:none; cursor:pointer">Sauvegarder (.txt)</button>
+            <button onclick="exportData()"
+                style="background:none; color:white; font-size:0.7em; margin-top:10px; text-decoration:underline; border:none; cursor:pointer">Exporter
+                une Sauvegarde (.txt)</button>
         </div>
 
         <div class="container">
-            <input type="text" id="search" class="search-bar" placeholder="🔍 Rechercher client ou article..." onkeyup="render()">
+            <input type="text" id="search" class="search-bar" placeholder="🔍 Rechercher un client ou article..."
+                onkeyup="render()">
 
             <div class="tabs">
                 <div class="tab active" id="tab-en_cours" onclick="switchTab('en_cours')">Dettes Actives</div>
-                <div class="tab" id="tab-dep" onclick="switchTab('dep')">Dépenses</div>
-                <div class="tab" id="tab-histo" onclick="switchTab('histo')">Archives</div>
+                <div class="tab" id="tab-depense" onclick="switchTab('depense')">Dépenses</div>
+                <div class="tab" id="tab-histo" onclick="switchTab('histo')">Dettes Payées</div>
             </div>
 
             <div id="list"></div>
-        </div>
-
-        <div class="fab-container">
-            <button class="fab add-depense" onclick="showAddDepense()" title="Ajouter Dépense">OUT</button>
-            <button class="fab add-dette" onclick="showAdd()">+</button>
-        </div>
-    </div>
-
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <h3 id="modal-title">Nouveau Crédit</h3>
-            <input type="hidden" id="edit-id"> 
-            <input type="text" id="f-nom" placeholder="Nom du Client">
-            <input type="number" id="f-tel" placeholder="N° WhatsApp (sans indicatif)">
-            <input type="number" id="f-mnt" placeholder="Montant">
-            <input type="text" id="f-mot" placeholder="Article(s) acheté(s)">
-            <div class="actions">
-                <button onclick="closeModal()" style="background:#999">Annuler</button>
-                <button onclick="saveDette()" style="background:var(--success)">ENREGISTRER</button>
+            <div style="position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px;">
+                <button onclick="showAddDepense()"
+                    style="width:60px; height:60px; border-radius:50%; background:#d32f2f; color:white; border:none; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.2);">OUT</button>
+                <button onclick="showAdd()"
+                    style="width:60px; height:60px; border-radius:50%; background:#2196f3; color:white; border:none; font-size:30px; box-shadow:0 4px 10px rgba(0,0,0,0.2);">+</button>
             </div>
-        </div>
-    </div>
 
-    <div id="modal-depense" class="modal">
-        <div class="modal-content">
-            <h3 style="color:var(--danger)">Nouvelle Dépense</h3>
-            <input type="text" id="d-mot" placeholder="Motif (ex: Loyer, Transport)">
-            <input type="number" id="d-mnt" placeholder="Montant (F)">
-            <div class="actions">
-                <button onclick="closeModal()" style="background:#999">Annuler</button>
-                <button onclick="saveDepense()" style="background:var(--danger)">ENREGISTRER</button>
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <h3 id="modal-title">Nouveau Crédit</h3>
+                    <input type="hidden" id="edit-id"> <input type="text" id="f-nom" placeholder="Nom du Client">
+                    <input type="number" id="f-tel" placeholder="N° WhatsApp (sans indicatif)">
+                    <input type="number" id="f-mnt" placeholder="Montant">
+                    <input type="text" id="f-mot" placeholder="Article(s) acheté(s)">
+                    <div class="actions">
+                        <button onclick="closeModal()" style="background:#999">Annuler</button>
+                        <button onclick="saveDette()" style="background:var(--success)">ENREGISTRER</button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <script>
-        let savedPIN = localStorage.getItem('debty_pin_pro');
-        let db = JSON.parse(localStorage.getItem('debty_v2_cam')) || [];
-        let depenses = JSON.parse(localStorage.getItem('debty_depenses')) || [];
-        let tab = 'en_cours';
+            <script>
+                /* ==========================================================
+            CONFIG ET VARIABLES GLOBALES
+            ========================================================== */
+                // On récupère le code PIN enregistré ou on prépare la création
+                let savedPIN = localStorage.getItem('debty_pin_pro');
+                let db = JSON.parse(localStorage.getItem('debty_v2_cam')) || [];
+                let tab = 'en_cours';
+                let depTotal = JSON.parse(localStorage.getItem('debty_depenses')) || [];
 
-        window.onload = function () {
-            if (!savedPIN) {
-                document.querySelector('#login-screen h2').innerText = "BIENVENUE";
-                document.querySelector('#log-desc').innerText = "Veuillez créer votre code PIN (4 chiffres)";
-                document.getElementById('btn-login-main').innerText = "CRÉER MON CODE";
-            }
-        }
+                /* ==========================================================
+                   FONCTIONS DE SÉCURITÉ (AMÉLIORÉES)
+                   ========================================================== */
 
-        function checkLogin() {
-            const pInput = document.getElementById('log-p').value;
-            if (!savedPIN) {
-                if (pInput.length >= 4) {
-                    localStorage.setItem('debty_pin_pro', pInput);
-                    savedPIN = pInput;
-                    alert("✅ Code PIN créé !");
-                    entrerDansApp();
-                } else { alert("Minimum 4 chiffres"); }
-            } else {
-                if (pInput === savedPIN) { entrerDansApp(); } 
-                else { alert("⛔ CODE PIN INCORRECT !"); }
-            }
-        }
+                // Fonction au démarrage pour adapter l'écran de login
+                window.onload = function () {
+                    if (!savedPIN) {
+                        document.querySelector('#login-screen h2').innerText = "BIENVENUE (1ère Utilisation)";
+                        document.querySelector('#login-screen p').innerText = "Veuillez créer votre code PIN de sécurité";
+                        document.querySelector('.login-btn').innerText = "CRÉER MON CODE";
+                    }
+                }
 
-        function entrerDansApp() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
-            render();
-        }
+                function checkLogin() {
+                    const pInput = document.getElementById('log-p').value;
 
-        function switchTab(t) {
-            tab = t;
-            document.getElementById('tab-en_cours').classList.toggle('active', t === 'en_cours');
-            document.getElementById('tab-dep').classList.toggle('active', t === 'dep');
-            document.getElementById('tab-histo').classList.toggle('active', t === 'histo');
-            render();
-        }
+                    // Si aucun PIN n'existe (Premier lancement)
+                    if (!savedPIN) {
+                        if (pInput.length >= 4) {
+                            localStorage.setItem('debty_pin_pro', pInput);
+                            savedPIN = pInput;
+                            alert("✅ Code PIN créé avec succès ! Ne l'oubliez pas.");
+                            entrerDansApp();
+                        } else {
+                            alert("Le code doit avoir au moins 4 chiffres");
+                        }
+                    }
+                    // Si un PIN existe déjà
+                    else {
+                        if (pInput === savedPIN) {
+                            entrerDansApp();
+                        } else {
+                            alert("⛔ CODE PIN INCORRECT !");
+                        }
+                    }
+                }
 
-        function showAdd() {
-            document.getElementById('modal-title').innerText = "Nouveau Crédit";
-            document.getElementById('edit-id').value = "";
-            document.getElementById('f-nom').value = ""; document.getElementById('f-tel').value = "";
-            document.getElementById('f-mnt').value = ""; document.getElementById('f-mot').value = "";
-            document.getElementById('modal').style.display = 'flex';
-        }
+                function entrerDansApp() {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                    render();
+                }
 
-        function showAddDepense() {
-            document.getElementById('d-mot').value = "";
-            document.getElementById('d-mnt').value = "";
-            document.getElementById('modal-depense').style.display = 'flex';
-        }
+                /* ==========================================================
+                   FONCTIONS DE GESTION DES DONNÉES
+                   ========================================================== */
 
-        function saveDette() {
-            const id = document.getElementById('edit-id').value;
-            const data = {
-                id: id ? parseInt(id) : Date.now(),
-                nom: document.getElementById('f-nom').value,
-                tel: document.getElementById('f-tel').value,
-                mnt: parseInt(document.getElementById('f-mnt').value),
-                mot: document.getElementById('f-mot').value,
-                date: new Date().toLocaleDateString(),
-                paye: false
-            };
-            if (!data.nom || !data.mnt) return alert("Nom et montant requis");
-            if (id) {
-                const index = db.findIndex(d => d.id === parseInt(id));
-                db[index] = { ...db[index], ...data };
-            } else { db.unshift(data); }
-            localStorage.setItem('debty_v2_cam', JSON.stringify(db));
-            closeModal(); render();
-        }
+                // Change l'affichage entre "En cours" et "Historique"
+                function switchTab(t) {
+                    tab = t;
+                    document.getElementById('tab-en_cours').classList.toggle('active', t === 'en_cours');
+                    document.getElementById('tab-histo').classList.toggle('active', t === 'histo');
+                    render();
+                }
 
-        function saveDepense() {
-            const motif = document.getElementById('d-mot').value;
-            const montant = document.getElementById('d-mnt').value;
-            if(!motif || !montant) return alert("Remplissez tous les champs");
-            depenses.unshift({ id: Date.now(), motif, mnt: parseInt(montant), date: new Date().toLocaleDateString() });
-            localStorage.setItem('debty_depenses', JSON.stringify(depenses));
-            closeModal(); render();
-        }
+                // Prépare le formulaire pour une nouvelle entrée
+                function showAdd() {
+                    document.getElementById('modal-title').innerText = "Nouveau Crédit";
+                    document.getElementById('edit-id').value = ""; // Vide l'ID pour dire "c'est un nouveau"
+                    document.getElementById('f-nom').value = "";
+                    document.getElementById('f-tel').value = "";
+                    document.getElementById('f-mnt').value = "";
+                    document.getElementById('f-mot').value = "";
+                    document.getElementById('modal').style.display = 'flex';
+                }
 
-        function editDette(id) {
-            const d = db.find(x => x.id === id);
-            document.getElementById('modal-title').innerText = "Modifier Crédit";
-            document.getElementById('edit-id').value = d.id;
-            document.getElementById('f-nom').value = d.nom;
-            document.getElementById('f-tel').value = d.tel;
-            document.getElementById('f-mnt').value = d.mnt;
-            document.getElementById('f-mot').value = d.mot;
-            document.getElementById('modal').style.display = 'flex';
-        }
+                // Enregistre ou Modifie une dette dans la base
+                function saveDette() {
+                    const id = document.getElementById('edit-id').value;
+                    const data = {
+                        id: id ? parseInt(id) : Date.now(), // On garde l'ancien ID ou on en crée un nouveau
+                        nom: document.getElementById('f-nom').value,
+                        tel: document.getElementById('f-tel').value,
+                        mnt: parseInt(document.getElementById('f-mnt').value),
+                        mot: document.getElementById('f-mot').value,
+                        date: new Date().toLocaleDateString(),
+                        paye: false
+                    };
 
-        function encaisser(id) {
-            if (confirm("Marquer comme payé ?")) {
-                let d = db.find(x => x.id === id);
-                d.paye = true; d.datePaye = new Date().toLocaleDateString();
-                localStorage.setItem('debty_v2_cam', JSON.stringify(db));
-                render();
-            }
-        }
+                    if (!data.nom || !data.mnt) return alert("Veuillez remplir au moins le nom et le montant.");
 
-        function supprimerDepense(id) {
-            if(confirm("Supprimer cette dépense ?")) {
-                depenses = depenses.filter(x => x.id !== id);
-                localStorage.setItem('debty_depenses', JSON.stringify(depenses));
-                render();
-            }
-        }
+                    if (id) {
+                        // Si on a un ID, on cherche la position de la dette pour la mettre à jour
+                        const index = db.findIndex(d => d.id === parseInt(id));
+                        db[index] = { ...db[index], ...data };
+                    } else {
+                        // Sinon on l'ajoute au début de la liste
+                        db.unshift(data);
+                    }
 
-        function rappel(nom, tel, mnt, mot) {
-            if (!tel) return alert("Pas de numéro WhatsApp.");
-            let indicatif = "237";
-            let n = tel.startsWith(indicatif) ? tel : indicatif + tel;
-            const m = `Bonjour *${nom}*, rappel de votre dette de *${mnt} F* pour : *${mot}*. Merci.`;
-            window.open(`https://wa.me/${n}?text=${encodeURIComponent(m)}`);
-        }
+                    localStorage.setItem('debty_v2_cam', JSON.stringify(db));
+                    closeModal();
+                    render();
+                }
 
-        function exportData() {
-            const data = { dettes: db, depenses: depenses };
-            const blob = new Blob([JSON.stringify(data)], { type: 'text/plain' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `SAUVEGARDE_DEBTY_${new Date().toLocaleDateString()}.txt`;
-            a.click();
-        }
+                // Remplit le formulaire avec les données d'un client existant pour modification
+                function editDette(id) {
+                    const d = db.find(x => x.id === id);
+                    document.getElementById('modal-title').innerText = "Modifier Crédit";
+                    document.getElementById('edit-id').value = d.id;
+                    document.getElementById('f-nom').value = d.nom;
+                    document.getElementById('f-tel').value = d.tel;
+                    document.getElementById('f-mnt').value = d.mnt;
+                    document.getElementById('f-mot').value = d.mot;
+                    document.getElementById('modal').style.display = 'flex';
+                }
 
-        function closeModal() { 
-            document.getElementById('modal').style.display = 'none'; 
-            document.getElementById('modal-depense').style.display = 'none';
-        }
+                // Marque une dette comme réglée
+                function encaisser(id) {
+                    if (confirm("L'argent a-t-il été bien reçu ?")) {
+                        let d = db.find(x => x.id === id);
+                        d.paye = true;
+                        d.datePaye = new Date().toLocaleDateString();
+                        localStorage.setItem('debty_v2_cam', JSON.stringify(db));
+                        render();
+                    }
+                }
 
-        function render() {
-            const list = document.getElementById('list');
-            const search = document.getElementById('search').value.toLowerCase();
-            list.innerHTML = "";
+                /* ==========================================================
+                   FONCTIONS INTERNATIONALES (WHATSAPP & EXPORT)
+                   ========================================================== */
 
-            let sDette = 0, sDepense = 0;
-            db.forEach(x => { if (!x.paye) sDette += x.mnt; });
-            depenses.forEach(x => { sDepense += x.mnt; });
+                // Envoie le message WhatsApp automatique
+                function rappel(nom, tel, mnt, mot) {
+                    if (!tel) return alert("Aucun numéro WhatsApp enregistré.");
 
-            document.getElementById('t-dette').innerText = sDette.toLocaleString() + " F";
-            document.getElementById('t-depense').innerText = sDepense.toLocaleString() + " F";
+                    // --- ZONE INTERNATIONALE ---
+                    // Pour le Cameroun : 237. Pour le Tchad : 235. Pour le Niger : 227.
+                    let indicatif = "237";
+                    let n = tel.startsWith(indicatif) ? tel : indicatif + tel;
 
-            if (tab === 'dep') {
-                const filteredDep = depenses.filter(x => x.motif.toLowerCase().includes(search));
-                filteredDep.forEach(x => {
-                    list.innerHTML += `<div class="card expense">
-                        <div class="row"><div><strong>${x.motif}</strong><br><small>${x.date}</small></div><div class="amount">${x.mnt.toLocaleString()} F</div></div>
-                        <div class="actions"><button onclick="supprimerDepense(${x.id})" style="background:gray; font-size:0.8em">Supprimer</button></div>
-                    </div>`;
-                });
-            } else {
-                const filtered = db.filter(x => (tab === 'en_cours' ? !x.paye : x.paye) && (x.nom.toLowerCase().includes(search) || x.mot.toLowerCase().includes(search)));
-                filtered.forEach(x => {
-                    list.innerHTML += `<div class="card ${x.paye ? 'paid' : ''}">
-                        <div class="row"><div><strong>${x.nom}</strong><br><small>${x.mot} (${x.date})</small></div><div class="amount">${x.mnt.toLocaleString()} F</div></div>
-                        ${!x.paye ? `<div class="actions"><button class="btn-edit" onclick="editDette(${x.id})">✏️</button><button class="btn-wa" onclick="rappel('${x.nom}','${x.tel}',${x.mnt},'${x.mot}')">WhatsApp</button><button class="btn-pay" onclick="encaisser(${x.id})">Réglé</button></div>` : `<div style="text-align:right; color:green; font-size:0.8em; margin-top:5px">Payé le ${x.datePaye}</div>`}
-                    </div>`;
-                });
-            }
-        }
-    </script>
+                    const m = `Bonjour *${nom}*, sauf erreur de ma part, nous attendons le règlement de votre dette de *${mnt} F* pour : *${mot}*. Merci de passer à la boutique.`;
+                    window.open(`https://wa.me/${n}?text=${encodeURIComponent(m)}`);
+                }
+
+                // Télécharge un fichier de secours sur le téléphone
+                function exportData() {
+                    const blob = new Blob([JSON.stringify(db)], { type: 'text/plain' });
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = `SAVE_DETTES_PRO_${new Date().toLocaleDateString()}.txt`;
+                    a.click();
+                }
+
+                function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+                /* ==========================================================
+                   MOTEUR D'AFFICHAGE (RENDER)
+                   ========================================================== */
+                function render() {
+                    const list = document.getElementById('list');
+                    const search = document.getElementById('search').value.toLowerCase();
+                    list.innerHTML = "";
+
+                    // 1. Calcul des totaux
+                    let sDette = 0, sPaye = 0, totalDep = 0;
+                    db.forEach(x => { if (x.paye) sPaye += x.mnt; else sDette += x.mnt; });
+                    // On récupère les dépenses pour le calcul
+                    let lesDepenses = JSON.parse(localStorage.getItem('debty_depenses')) || [];
+                    lesDepenses.forEach(d => { totalDep += d.mnt; });
+
+                    document.getElementById('t-dette').innerText = sDette.toLocaleString() + " F";
+                    // On affiche le net (Argent reçu - Dépenses)
+                    document.getElementById('t-paye').innerText = (sPaye - totalDep).toLocaleString() + " F";
+
+                    // 2. AFFICHAGE SELON L'ONGLET
+                    if (tab === 'depense') {
+                        // --- VUE HISTORIQUE DES DÉPENSES ---
+                        if (lesDepenses.length === 0) list.innerHTML = "<p style='text-align:center;color:#999'>Aucune dépense enregistrée.</p>";
+
+                        lesDepenses.forEach((x, index) => {
+                            list.innerHTML += `
+                <div class="card" style="border-left-color: #d32f2f;">
+                    <div class="row">
+                        <div><strong>${x.motif}</strong><br><small>Sortie de caisse (${x.date})</small></div>
+                        <div class="amount" style="color:#d32f2f">-${x.mnt.toLocaleString()} F</div>
+                    </div>
+                </div>`;
+                        });
+                    } else {
+                        // --- VUE DETTES (Ton code original) ---
+                        const filtered = db.filter(x =>
+                            (tab === 'en_cours' ? !x.paye : x.paye) &&
+                            (x.nom.toLowerCase().includes(search) || x.mot.toLowerCase().includes(search))
+                        );
+
+                        if (filtered.length === 0) list.innerHTML = "<p style='text-align:center;color:#999'>Aucun dossier trouvé.</p>";
+
+                        filtered.forEach(x => {
+                            list.innerHTML += `
+                <div class="card ${x.paye ? 'paid' : ''}">
+                    <div class="row">
+                        <div><strong>${x.nom}</strong><br><small>${x.mot} (${x.date})</small></div>
+                        <div class="amount">${x.mnt.toLocaleString()} F</div>
+                    </div>
+                    ${!x.paye ? `
+                    <div class="actions">
+                        <button class="btn-edit" onclick="editDette(${x.id})">✏️</button>
+                        <button class="btn-wa" onclick="rappel('${x.nom}','${x.tel}',${x.mnt},'${x.mot}')">WA</button>
+                        <button class="btn-pay" onclick="encaisser(${x.id})">RÉGLÉ ✅</button>
+                    </div>` : `<div style="text-align:right; color:green; font-size:0.8em; margin-top:5px">Payé le ${x.datePaye}</div>`}
+                </div>`;
+                        });
+                    }
+                }
+                // On crée une liste vide pour les dépenses
+                let listeDepenses = JSON.parse(localStorage.getItem('debty_depenses')) || [];
+
+                function showAddDepense() {
+                    document.getElementById('modal-depense').style.display = 'flex';
+                }
+
+                function validerDepense() {
+                    const motif = document.getElementById('dep-motif').value;
+                    const montant = document.getElementById('dep-montant').value;
+
+                    if (motif && montant) {
+                        const nouvelleDep = {
+                            id: Date.now(),
+                            motif: motif,
+                            mnt: parseInt(montant),
+                            date: new Date().toLocaleDateString()
+                        };
+                        listeDepenses.unshift(nouvelleDep);
+                        localStorage.setItem('debty_depenses', JSON.stringify(listeDepenses));
+                        document.getElementById('modal-depense').style.display = 'none';
+                        alert("Dépense enregistrée !");
+                        // Optionnel : tu peux appeler render() si tu as créé un onglet pour les voir
+                    } else {
+                        alert("Remplis tous les champs");
+                    }
+                }
+                function validerDepense() {
+                    const motif = document.getElementById('dep-motif').value;
+                    const montant = document.getElementById('dep-montant').value;
+
+                    if (motif && montant) {
+                        depTotal.push({ mnt: parseInt(montant), motif: motif });
+                        localStorage.setItem('debty_depenses', JSON.stringify(depTotal));
+                        document.getElementById('modal-depense').style.display = 'none';
+
+                        render(); // CA MET À JOUR TES CHIFFRES EN HAUT DIRECTEMENT !
+                        alert("Dépense de " + montant + " F déduite de la caisse.");
+                    }
+                }
+            </script>
+            <div id="modal-depense" class="modal"
+                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:1000;">
+                <div style="background:white; padding:20px; width:85%; border-radius:15px;">
+                    <h3 style="color:#d32f2f">Nouvelle Dépense</h3>
+                    <input type="text" id="dep-motif" placeholder="Motif (ex: Loyer, Transport)"
+                        style="width:100%; padding:12px; margin:5px 0; box-sizing:border-box;">
+                    <input type="number" id="dep-montant" placeholder="Montant"
+                        style="width:100%; padding:12px; margin:5px 0; box-sizing:border-box;">
+                    <div style="display:flex; gap:10px; margin-top:10px;">
+                        <button onclick="document.getElementById('modal-depense').style.display='none'"
+                            style="background:#999; flex:1; padding:12px; border-radius:8px; color:white; border:none;">Annuler</button>
+                        <button onclick="validerDepense()"
+                            style="background:#d32f2f; flex:1; padding:12px; border-radius:8px; color:white; border:none;">ENREGISTRER</button>
+                    </div>
+                </div>
+            </div>
 </body>
+
 </html>
